@@ -2,7 +2,7 @@
 
 [Eleventy LibDoc website](https://eleventy-libdoc.netlify.app/) | [11ty website](11ty)
 
-Eleventy LibDoc is an easy to use and content focused starter project for [Eleventy][11ty] to craft slick and responsive documentation. It was was developed with accessibility awareness and low-tech mindset which allows to reach good page speed performances. It contains vanilla JS self-made components like search, primary navigation, table of content, code highlighting and sandboxes. Every page created with LibDoc is printable and can work properly even without Javascript by maintaining only essential features.
+Eleventy LibDoc is an easy to use and content focused starter project for [Eleventy][11ty] to craft slick and responsive documentation. It was was developed with accessibility awareness and low-tech mindset which allows to reach good page speed performances. It contains vanilla JS self-made components like search, primary navigation, table of content, code highlighting and sandboxes. Every page created with LibDoc is printable and can work properly even without Javascript by maintaining only essential features
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/d1986dbf-2272-4614-8dec-c228ba4699ef/deploy-status)](https://app.netlify.com/sites/11ty-libdoc-blank/deploys)
 
