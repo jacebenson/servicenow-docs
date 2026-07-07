@@ -4,6 +4,7 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
+RUN apk add --no-cache git
 RUN npm ci
 
 # Copy source and build - skip image transforms that may timeout in CI
