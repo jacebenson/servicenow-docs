@@ -1,23 +1,25 @@
 // START 11TY imports
-import eleventyNavigationPlugin from "@11ty/eleventy-navigation";
-import { InputPathToUrlTransformPlugin } from "@11ty/eleventy";
-import { eleventyImageTransformPlugin } from "@11ty/eleventy-img";
-import { EleventyHtmlBasePlugin } from "@11ty/eleventy";
+import eleventyNavigationPlugin             from "@11ty/eleventy-navigation";
+import { InputPathToUrlTransformPlugin }    from "@11ty/eleventy";
+import { eleventyImageTransformPlugin }     from "@11ty/eleventy-img";
+import { EleventyHtmlBasePlugin }           from "@11ty/eleventy";
+import pluginRss                            from "@11ty/eleventy-plugin-rss";
 // END 11TY imports
 
 // START LibDoc imports
-import libdocConfig from "./_data/libdocConfig.js";
-import libdocFunctions from "./_data/libdocFunctions.js";
+import libdocConfig                         from "./_data/libdocConfig.js";
+import libdocFunctions                      from "./_data/libdocFunctions.js";
 // END LibDoc imports
 import { getLinks, getEntitlements } from "./_data/skus.js";
 import { markdownEquivalentsPlugin } from "./_data/markdown-equivalents.js";
 
-export default function (eleventyConfig) {
+export default function(eleventyConfig) {
     // START PLUGINS
     eleventyConfig.addPlugin(EleventyHtmlBasePlugin);
     eleventyConfig.addPlugin(InputPathToUrlTransformPlugin);
     eleventyConfig.addPlugin(eleventyNavigationPlugin);
     eleventyConfig.addPlugin(eleventyImageTransformPlugin, libdocFunctions.pluginsParameters.eleventyImageTransform());
+    eleventyConfig.addPlugin(pluginRss);
     eleventyConfig.addPlugin(markdownEquivalentsPlugin);
     // END PLUGINS
 
@@ -28,6 +30,8 @@ export default function (eleventyConfig) {
     eleventyConfig.addAsyncFilter("dateString", libdocFunctions.filters.dateString);
     eleventyConfig.addAsyncFilter("datePrefixText", libdocFunctions.filters.datePrefixText);
     eleventyConfig.addAsyncFilter("toc", libdocFunctions.filters.toc);
+    eleventyConfig.addAsyncFilter("sanitizeJSON", libdocFunctions.filters.sanitizeJson);
+    eleventyConfig.addAsyncFilter("gitLastModifiedDate", libdocFunctions.filters.gitLastModifiedDate);
     // END FILTERS
 
     // START COLLECTIONS
@@ -39,7 +43,7 @@ export default function (eleventyConfig) {
     eleventyConfig.addShortcode("alert", libdocFunctions.shortcodes.alert);
     eleventyConfig.addPairedShortcode("alertAlt", libdocFunctions.shortcodes.alert);
     eleventyConfig.addShortcode("embed", libdocFunctions.shortcodes.embed);
-    eleventyConfig.addShortcode("icomoon", libdocFunctions.shortcodes.icomoon);
+    eleventyConfig.addShortcode("icons", libdocFunctions.shortcodes.icons);
     eleventyConfig.addShortcode("icon", libdocFunctions.shortcodes.icon);
     eleventyConfig.addShortcode("iconCard", libdocFunctions.shortcodes.iconCard);
     eleventyConfig.addPairedShortcode("sandbox", libdocFunctions.shortcodes.sandbox);
@@ -47,16 +51,14 @@ export default function (eleventyConfig) {
     eleventyConfig.addShortcode('tag', (arg) => `<div>${arg}</div>`);
     eleventyConfig.addShortcode('sku', getLinks);
     eleventyConfig.addShortcode('ent', getEntitlements);
-
-
     // END SHORTCODES
 
     // START FILE COPY
-    eleventyConfig.addPassthroughCopy("sandboxes");
-    eleventyConfig.addPassthroughCopy("assets");
+    eleventyConfig.addPassthroughCopy({ "src/sandboxes": "sandboxes" });
+    eleventyConfig.addPassthroughCopy({ "src/assets": "assets" });
     eleventyConfig.addPassthroughCopy("core/assets");
-    eleventyConfig.addPassthroughCopy("favicon.png");
-    eleventyConfig.addPassthroughCopy("admin");
+    eleventyConfig.addPassthroughCopy({ "src/favicon.png": "favicon.png" });
+    eleventyConfig.addPassthroughCopy({ "src/admin": "admin" });
     // END FILE COPY
 
     eleventyConfig.addFilter("removeEscapedCharacted", function (value) {
@@ -64,8 +66,12 @@ export default function (eleventyConfig) {
         return value;
     });
 
-
     return {
+        dir: {
+            input: "src",
+            data: "../_data",
+            includes: "../_includes"
+        },
         pathPrefix: libdocConfig.htmlBasePathPrefix
     }
 };

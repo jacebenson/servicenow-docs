@@ -3,15 +3,14 @@
 // https://github.com/11ty/eleventy/issues/3128#issuecomment-1878745864
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
+const childProcess = require('child_process');
 // END IMPORT REQUIRE WORKAROUND
 
 // START JSON IMPORT WORKAROUND
 // import libdocMessages   from "./libdocMessages.json" with { "type": "json" };
 // import libdocSystem     from "./libdocSystem.json" with { "type": "json" };
-// import icomoon          from "../core/assets/fonts/icomoon/selection.json" with { "type": "json" };
 const libdocSystem =        require("./libdocSystem.json");
 const libdocMessages =      require("./libdocMessages.json");
-const icomoon =             require("../core/assets/fonts/icomoon/selection.json");
 // END JSON IMPORT WORKAROUND
 
 import libdocUtils          from    "./libdocUtils.js";
@@ -56,6 +55,13 @@ export default {
         }
     },
     filters: {
+        sanitizeJson: async function(value) {
+            // Remove back slashes
+            value = value.replaceAll('\\', '');
+            // Remove extra spaces
+            value = value.replace(/\s+/g, ' ').trim();
+            return value;
+        },
         autoids: async function(content) {
             let i = 0;
             const anchorsIds = [];
@@ -68,6 +74,8 @@ export default {
                         slugifiedId += `-${i}`;
                     }
                     anchorsIds.push(slugifiedId);
+                    const invalidFirstCharacters = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+                    if (invalidFirstCharacters.includes(slugifiedId[0])) slugifiedId = 'a_' + slugifiedId;
                     const markup = `
                         <${m1} id="${slugifiedId}" pl-9="xs,sm">
                             <a  href="#${slugifiedId}"
@@ -102,7 +110,7 @@ export default {
             }
         },
         cleanup: async function(content) {
-            content = content.replaceAll(`<table>`, `<div class="o-auto w-100 table-wrapper"><table>`);
+            content = content.replaceAll(`<table`, `<div class="o-auto w-100 table-wrapper"><table`);
             content = content.replaceAll(`</table>`, `</table></div>`);
             content = content.replaceAll(`<p><div`, `<div`);
             content = content.replaceAll(`</div></p>`, `</div>`);
@@ -146,10 +154,12 @@ export default {
                         slugifiedId += `-${tagIndex}`;
                     }
                     anchorsIds.push(slugifiedId);
+                    const invalidFirstCharacters = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+                    if (invalidFirstCharacters.includes(slugifiedId[0])) slugifiedId = 'a_' + slugifiedId;
                     tocMarkup += `
                         <li class="d-flex">
                             <a  href="#${slugifiedId}"
-                                class="pl-5 pt-1 pb-1 | fs-4 lsp-3 lh-5 fvs-wght-400 | blwidth-1 blstyle-dashed bcolor-neutral-500">
+                                class="pl-5 pt-1 pb-1 | fs-4 lsp-3 lh-5 fvs-wght-400 wb-break-word | blwidth-1 blstyle-dashed bcolor-neutral-500">
                                 ${htmlTag.value}
                             </a>
                         </li>`;
@@ -157,20 +167,42 @@ export default {
                 tocMarkup += '</ol>';
             }
             return tocMarkup;
+        },
+        gitLastModifiedDate: async function(filePath) {
+            // Run the git log command
+            // https://jamesdoc.com/blog/2023/git-changelog-in-11ty/
+            let fileHistory = childProcess
+                .execSync(`git log --pretty=tformat:"%cs" ${filePath}`)
+                .toString()
+                .trim();
+
+            // If the file isn't committed to git then ignore
+            if (fileHistory == "") { return false }
+
+            return fileHistory.split(/\r?\n/)[0];
         }
     },
     collections: {
         myTags: function(collectionsApi) {
             const allData = collectionsApi.getAll();
-            let finalData = [];
+            let unsortedTagsCount = {};
             allData.forEach(function(item) {
                 if (typeof item.data.tags == 'object') {
                     item.data.tags.forEach(function(tag) {
-                        if (!finalData.includes(tag) && tag != 'post') finalData.push(tag);
+                        if (tag !== 'post') {
+                            if (unsortedTagsCount[tag] === undefined) {
+                                unsortedTagsCount[tag] = 1
+                            } else {
+                                unsortedTagsCount[tag]++
+                            }
+                        }
                     })
                 }
             });
-            return finalData;
+            let sortedObject = Object.fromEntries(
+                Object.entries(unsortedTagsCount).sort(([, a], [, b]) => b - a)
+            );
+            return Object.entries(sortedObject);
         },
         postsByDateDescending: function(collectionsApi) {
             return collectionsApi.getFilteredByTag("post").sort(function (a, b) {
@@ -204,46 +236,37 @@ export default {
         },
         icon: async function(iconName, iconSize) {
             let markup = '';
-            let isAnIcon = false;
-            icomoon.icons.forEach(function(iconData) {
-                if (iconData.properties.name == iconName) isAnIcon = true;
-            });
-            if (isAnIcon) {
-                const fontSizeParse = parseInt(iconSize);
-                let dsFontSize = '';
-                if (!isNaN(fontSizeParse)) {
-                    if (fontSizeParse < 11 && fontSizeParse > 0) {
-                        dsFontSize = fontSizeParse;
-                    } else {
-                        console.log(`icon shortcode "${iconName}" is a valid icon but "${fontSizeParse}" is not a valid icon size, icon size must be an integer from 1 to 10`)
-                    }
+            const fontSizeParse = parseInt(iconSize);
+            const isSystemIcon = libdocSystem.icons.includes(iconName);
+            let dsFontSize = '';
+            if (!isNaN(fontSizeParse)) {
+                if (fontSizeParse < 11 && fontSizeParse > 0) {
+                    dsFontSize = fontSizeParse;
                 }
+            }
+            if (isSystemIcon) {
                 markup = `<span class="icon-${iconName} fs-${dsFontSize}"></span>`;
             } else {
-                console.log(`icon shortcode "${iconName}" is not a valid icon, see https://eleventy-libdoc.netlify.app/creating-content/widgets/icons/`)
+                markup = `<span class="icon- fs-${dsFontSize}" style="mask-image: url('${libdocConfig.htmlBasePathPrefix}${iconName}')"></span>`;
             }
             return markup;
         },
         iconCard: async function(mainText, description, iconName) {
             let markup = '';
             if (typeof mainText == 'string' && typeof description == 'string') {
-                let isAnIcon = false,
-                    finalIconName = 'check-circle';
-                if (typeof iconName == 'string') {
-                    icomoon.icons.forEach(function(iconData) {
-                        if (iconData.properties.name == iconName) {
-                            finalIconName = iconName;
-                            isAnIcon = true;
-                        }
-                    });
-                }
-                if (!isAnIcon && iconName !== undefined) {
-                    console.log(`iconCard shortcode: ${iconName} is not a valid icon, default ${finalIconName} applied.`);
+                const isSystemIcon = libdocSystem.icons.includes(iconName);
+                let iconMarkup = ``;
+                if (isSystemIcon) {
+                    iconMarkup = `<span class="icon-${iconName} fs-10 | c-primary-500" fs-8="xs"></span>`;
+                } else {
+                    iconMarkup = `<span class="icon- fs-10 | c-primary-500"
+                            fs-8="xs"
+                            style="mask-image: url('${libdocConfig.htmlBasePathPrefix}${iconName || `/core/assets/icons/check-circle.svg`}')"></span>`;
                 }
                 markup = `
                     <aside class="widget widget-iconCard">
-                        <p class="d-flex gap-5 | p-5 m-0 | brad-3 bc-neutral-100 bwidth-1 bstyle-dashed bcolor-neutral-500">
-                            <span class="icon-${finalIconName} fs-10 | c-primary-500" fs-8="xs"></span>
+                        <p class="d-flex gap-5 | p-5 m-0 | brad-3 bwidth-1 bstyle-dashed bcolor-neutral-500">
+                            ${iconMarkup}
                             <span class="d-flex fd-column gap-1">
                                 <strong class="fvs-wght-700 fs-6">${mainText}</strong>
                                 <span>${description}</span>
@@ -273,24 +296,17 @@ export default {
                 return '';
             }
         },
-        icomoon: async function() {
-            const w = libdocSystem.icomoonIconSize;
+        icons: async function() {
             let markup = `
-                <aside class="widget widget-icomoon | mt-10 mb-10"
+                <aside class="widget widget-icons | mt-10 mb-10"
                     mt-7="xs"
                     mb-7="xs">
                     <ul class="d-flex fw-wrap gap-7 | p-0 | ls-none" rgap-10="sm,md">`;
-            icomoon.icons.forEach(function(iconData) {
-                let pathsMarkup = '';
-                iconData.icon.paths.forEach(function(path) {
-                    pathsMarkup += path;
-                });
+            libdocSystem.icons.forEach(function(iconName) {
                 markup += `
                     <li class="d-flex fd-column ai-center gap-3" style="width: 20%">
-                        <svg class="icomoon-icon" width="${w}" height="${w}" viewBox="0 0 ${w} ${w}">
-                            <path d="${pathsMarkup}" fill="currentColor"></path>
-                        </svg>
-                        <code class="fs-2 tws-balance ta-center" fs-1="xs">${iconData.properties.name}</code>
+                        <span class="icon-${iconName} fs-10"></span>
+                        <code class="fs-2 tws-balance ta-center" fs-1="xs">${iconName}</code>
                     </li>`;
             });
             markup += '</ul></aside>';
@@ -319,16 +335,16 @@ export default {
                                 title="${libdocMessages.openInANewTab[libdocConfig.lang]}"
                                 class="d-flex ai-center gap-1 | p-0 | fvs-wght-400 fs-2 tt-uppercase td-none | sandbox__permalink"
                                 fs-2="xs">
-                                <span class="fvs-wght-400 | c-neutral-300">${libdocMessages.open[libdocConfig.lang]}</span>
-                                <span class="icon-arrow-square-out c-neutral-500"></span>
+                                <span class="fvs-wght-400">${libdocMessages.open[libdocConfig.lang]}</span>
+                                <span class="icon-arrow-square-out"></span>
                             </a>
                             <div class="d-flex gap-7">
                                 <button type="button"
-                                    class="d-flex ai-center | p-0 | fvs-wght-400 fs-2 tt-uppercase | bc-0 c-neutral-300 b-0 cur-pointer | sandbox__reload">
+                                    class="d-flex ai-center | p-0 | fvs-wght-400 fs-2 tt-uppercase | bc-0 b-0 cur-pointer | sandbox__reload">
                                     <span class="o-hidden | to-ellipsis ws-nowrap">${libdocMessages.reload[libdocConfig.lang]}</span>
                                 </button>
                                 <button type="button"
-                                    class="d-flex ai-center | p-0 | fvs-wght-400 fs-2 tt-uppercase | bc-0 c-neutral-300 b-0 cur-pointer | sandbox__copy_url">
+                                    class="d-flex ai-center | p-0 | fvs-wght-400 fs-2 tt-uppercase | bc-0 b-0 cur-pointer | sandbox__copy_url">
                                     <span class="o-hidden | to-ellipsis ws-nowrap">${libdocMessages.copyURL[libdocConfig.lang]}</span>
                                 </button>
                             </div>
