@@ -1,6 +1,10 @@
 const libdocUi = {
     defaults: {
         localStorageIdentifier: 'eleventyLibdoc',
+        colorSchemes: ['auto', 'light', 'dark'],
+        darkModeCssFilePath: `${libdocConfig.htmlBasePathPrefix}/core/assets/css/ds__dark_mode.css`,
+        supportedLanguagesJsonPath: `${libdocConfig.htmlBasePathPrefix}/core/assets/js/supported-languages.json`,
+        darkModeCssMedia: '',
         screenSizes: {
             xs: [0, 599],
             sm: [600, 959],
@@ -25,7 +29,10 @@ const libdocUi = {
         searchForms: document.querySelectorAll('.search_form'),
         searchInputs: document.querySelectorAll('input[type="search"][name="search"]'),
         searchClearBtns: document.querySelectorAll('.search_form__clear_btn'),
-        ftocHeadings: []
+        ftocHeadings: [],
+        darkModeCssMetaLink: document.head.querySelector('#libdoc_dark_mode_css'),
+        inputsColorScheme: document.querySelectorAll('[name="libdoc_color_scheme"]'),
+        customLinks: document.querySelector('#custom_links')
     },
     getTransferSize: function() {
         // https://jmperezperez.com/blog/page-load-footer/
@@ -225,39 +232,11 @@ const libdocUi = {
             document.body.insertAdjacentHTML('beforeend', n_markup);
         }
     },
-    // getUserSelection: function() {
-    //     let result = { text: "", selection: null };
-    //     if (window.getSelection) {
-    //         result.text = window.getSelection().toString();
-    //         result.selection = window.getSelection();
-    //     } else if (document.selection && document.selection.type != "Control") {
-    //         result.text = document.selection.createRange().text;
-    //     }
-    //     return result;
-    // },
     handlers: {
-        // _selectionChange: function(evt) {
-        //     const selection = libdocUi.getUserSelection();
-        //     if (libdocUi.el.selectionCmd === undefined) {
-        //         libdocUi.el.selectionCmd = document.createElement('a');
-        //         libdocUi.el.selectionCmd.href = '';
-        //         libdocUi.el.selectionCmd.setAttribute(
-        //             'class',
-        //             'pos-absolute t-tX-100 | p-4 | td-none | brad-4 bc-neutral-100 bwidth-1 bstyle-dashed bcolor-neutral-500 __hover-1 __soft-shadow'
-        //         );
-        //         libdocUi.el.selectionCmd.innerHTML = `<span class="icon-link-simple | pos-absolute top-50 left-50 t-tY-50 t-tX-50 | fs-4"></span>`;
-        //     }
-        //     if (selection.selection !== null && selection.text.length > 0) {
-        //         const elSelectionParent = selection.selection.anchorNode.parentElement;
-        //         Object.keys(libdocUi.el.main.children).forEach(function(indexString) {
-        //             const elMainChild = libdocUi.el.main.children[parseInt(indexString)];
-        //             if (elMainChild.contains(elSelectionParent)) {
-        //                 libdocUi.el.selectionCmd.href = `${location.host}${location.pathname}#__${indexString}`;
-        //                 elSelectionParent.prepend(libdocUi.el.selectionCmd);
-        //             }
-        //         })
-        //     }
-        // },
+        _colorSchemeClick: function(event) {
+            // console.log(event.target.value)
+            libdocUi.setColorScheme(event.target.value);
+        },
         _touchStart: function(evt) {
             document.body.classList.add('touch-device');
             document.body.removeEventListener('touch', libdocUi.handlers._touchStart);
@@ -319,6 +298,7 @@ const libdocUi = {
             libdocUi._currentScreenSizeName = libdocUi.getCurrentScreenSizeName();
             libdocUi.updateSearchOccurrenceCmdBottom();
             libdocUi.updateNavPrimary();
+            libdocUi.updateCustomLinks();
         },
         _windowLoad: function() {
             const textQuery = libdocUi._searchParams.get('text') || libdocUi._searchParams.get('search');
@@ -368,6 +348,9 @@ const libdocUi = {
             evt.target.dataset.title = evt.target.title;
             evt.target.removeEventListener('click', libdocUi.handlers._clickAbbr);
             evt.target.removeAttribute('title');
+        },
+        _DOMContentLoaded: function() {
+            libdocUi.initKeyShortcuts();
         }
     },
     fitSvgToItsContent: function(svgElement) {
@@ -385,37 +368,6 @@ const libdocUi = {
         const viewbox = `${xMin} ${yMin} ${xMax - xMin} ${yMax - yMin}`;
 
         svg.setAttribute('viewBox', viewbox);
-    },
-    renderIcomoon: function(id) {
-        if (typeof id == 'string') {
-            const elIconsContainer = document.getElementById(id);
-            if (elIconsContainer !== null) {
-                fetch('/core/assets/fonts/icomoon/selection.json')
-                    .then(response => response.json())
-                    .then(json => {
-                        json.icons.forEach(function(iconData) {
-                            const   elItem = document.createElement('li'),
-                                    elSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                            elItem.setAttribute('class', 'd-flex fd-column ai-center | ta-center');
-                            elSvg.setAttribute('width', '32');
-                            elSvg.setAttribute('height', '32');
-                            elSvg.setAttributeNS(null, "viewBox", "0 0 32 32");
-                            elSvg.setAttribute('fill', 'none');
-                            iconData.icon.paths.forEach(function(pathData) {
-                                elSvg.innerHTML += `<path d="${pathData}" fill="currentColor"></path>`;
-                            });
-                            elItem.appendChild(elSvg);
-                            elIconsContainer.appendChild(elItem);
-                            libdocUi.fitSvgToItsContent(elSvg);
-                            elItem.innerHTML += `<code>icon-${iconData.properties.name}</code>`;
-                        });
-                    })
-                    .catch(error => {
-                        // Handle the error
-                        console.log(error);
-                    });
-            }
-        }
     },
     updateTransferSizeDisplay: function() {
         const currentTransferSize = libdocUi.getTransferSize();
@@ -488,7 +440,8 @@ const libdocUi = {
             elDetails.appendChild(elSummary);
             
             let floatingTocMarkup = `
-                <div d-flex="md"
+                <div id="floating_toc__list_parent"
+                    d-flex="md"
                     jc-end="md">
                     <ul id="floating_toc__list"
                         class="
@@ -513,7 +466,7 @@ const libdocUi = {
                 floatingTocMarkup += `
                     <li>
                         <a  href="${headingReference}"
-                            class="d-flex | pl-5 pr-5 | fs-4 lsp-3 lh-5 fvs-wght-500 | c-primary-500 blwidth-1 blstyle-dashed bcolor-primary-300"
+                            class="d-flex | pl-5 pr-5 | fs-3 lsp-3 lh-5 fvs-wght-400 td-none | c-primary-500 blwidth-1 blstyle-dashed bcolor-primary-300"
                             pt-2="md"
                             pb-2="md"
                             pt-1="xs,sm"
@@ -659,11 +612,11 @@ const libdocUi = {
                 linkIndexesArray.forEach(function(isInViewport, linkIndex) {
                     if (isInViewport) {
                         // libdocUi.el.ftocLinks[linkIndex].style.backgroundColor = 'var(--ita-colors-primary-200)';
-                        libdocUi.el.ftocLinks[linkIndex].classList.add('bc-primary-200');
+                        libdocUi.el.ftocLinks[linkIndex].classList.add('__active');
                         if (firstTrueIndex === -1) firstTrueIndex = linkIndex;
                     } else {
                         // libdocUi.el.ftocLinks[linkIndex].style.backgroundColor = null;
-                        libdocUi.el.ftocLinks[linkIndex].classList.remove('bc-primary-200');
+                        libdocUi.el.ftocLinks[linkIndex].classList.remove('__active');
                     }
                 });
                 if (firstTrueIndex > -1) {
@@ -710,33 +663,39 @@ const libdocUi = {
             && typeof libdocUi.el.searchOccurrencesCmd === 'undefined') {
             libdocUi.el.searchOccurrencesCmd = document.createElement('nav');
             libdocUi.el.searchOccurrencesCmd.id = 'query_occurrences_cmd';
-            libdocUi.el.searchOccurrencesCmd.setAttribute('class', 'd-flex gap-2 | pos-sticky bottom-0 z-1 | pb-5');
+            libdocUi.el.searchOccurrencesCmd.setAttribute('class', 'd-flex fw-wrap jc-space-between ai-center gap-5 | pos-sticky bottom-0 z-1 | pb-5 pt-5 | bs-1 bc-success-100 bradtl-3 bradtr-3');
+            const text = new URLSearchParams(location.search).get('text') || '';
             libdocUi.el.searchOccurrencesCmd.innerHTML = `
-                <div class="pos-absolute top-0 left-0 | w-100 h-100 | __gradient-mask-primary-100-to-top"></div>
-                <button type="button"
-                    class="pos-relative | h-50px ar-square | fs-5 | brad-4 bc-success-100 c-success-900 bwidth-1 bstyle-dashed bcolor-success-900 cur-pointer __hover-2"
-                    onclick="libdocUi.prevSearchOccurrence()"
-                    title="${libdocMessages.searchOccurrencesPrevious}">
-                    <span class="icon-caret-left | pos-absolute top-50 left-50 t-tY-50 t-tX-50 | c-success-900"></span>
-                </button>
-                <button type="button"
-                    class="pos-relative | h-50px ar-square | fs-2 | brad-4 bc-success-100 c-success-900 bwidth-1 bstyle-dashed bcolor-success-900 cur-pointer __hover-2"
-                    onclick="libdocUi.curSearchOccurrence()"
-                    title="${libdocMessages.searchOccurrencesCurrent}">
-                    <span id="current_query_occurrence_index_position" class="pos-absolute top-50 left-50 t-tY-50 t-tX-50 | c-success-900"></span>
-                </button>
-                <button type="button"
-                    class="pos-relative | h-50px ar-square | fs-5 | brad-4 bc-success-100 c-success-900 bwidth-1 bstyle-dashed bcolor-success-900 cur-pointer __hover-2"
-                    onclick="libdocUi.nextSearchOccurrence()"
-                    title="${libdocMessages.searchOccurrencesNext}">
-                    <span class="icon-caret-right | pos-absolute top-50 left-50 t-tY-50 t-tX-50 | c-success-900"></span>
-                </button>
-                <button type="button"
-                    class="pos-relative | h-50px ar-square | fs-2 | brad-4 bc-success-100 c-success-900 bwidth-1 bstyle-dashed bcolor-success-900 cur-pointer __hover-2"
-                    onclick="libdocUi.stopSearchOccurrence()"
-                    title="${libdocMessages.searchOccurrencesStop}">
-                    <span class="icon-x | pos-absolute top-50 left-50 t-tY-50 t-tX-50 | c-success-900"></span>
-                </button>`;
+                <p class="d-flex ai-baseline gap-2 | m-0 | fs-2">
+                    ${libdocMessages.searchOccurrence}
+                    <strong class="pt-1 pb-1 pl-3 pr-3 | fvs-500 | bc-success-900 c-success-100 brad-1">${text}</strong>
+                </p>
+                <div class="d-flex gap-2">
+                    <button type="button"
+                        class="pos-relative | h-50px ar-square | fs-5 | brad-4 bc-neutral-100 c-success-900 bwidth-1 bstyle-dashed bcolor-success-900 cur-pointer __hover-2"
+                        onclick="libdocUi.prevSearchOccurrence()"
+                        title="${libdocMessages.searchOccurrencesPrevious}">
+                        <span class="icon-caret-left | pos-absolute top-50 left-50 t-tY-50 t-tX-50 | c-success-900"></span>
+                    </button>
+                    <button type="button"
+                        class="pos-relative | h-50px ar-square | fs-2 | brad-4 bc-neutral-100 c-success-900 bwidth-1 bstyle-dashed bcolor-success-900 cur-pointer __hover-2"
+                        onclick="libdocUi.curSearchOccurrence()"
+                        title="${libdocMessages.searchOccurrencesCurrent}">
+                        <span id="current_query_occurrence_index_position" class="pos-absolute top-50 left-50 t-tY-50 t-tX-50 | c-success-900"></span>
+                    </button>
+                    <button type="button"
+                        class="pos-relative | h-50px ar-square | fs-5 | brad-4 bc-neutral-100 c-success-900 bwidth-1 bstyle-dashed bcolor-success-900 cur-pointer __hover-2"
+                        onclick="libdocUi.nextSearchOccurrence()"
+                        title="${libdocMessages.searchOccurrencesNext}">
+                        <span class="icon-caret-right | pos-absolute top-50 left-50 t-tY-50 t-tX-50 | c-success-900"></span>
+                    </button>
+                    <button type="button"
+                        class="pos-relative | h-50px ar-square | fs-2 | brad-4 bc-neutral-100 c-success-900 bwidth-1 bstyle-dashed bcolor-success-900 cur-pointer __hover-2"
+                        onclick="libdocUi.stopSearchOccurrence()"
+                        title="${libdocMessages.searchOccurrencesStop}">
+                        <span class="icon-x | pos-absolute top-50 left-50 t-tY-50 t-tX-50 | c-success-900"></span>
+                    </button>
+                </div>`;
             libdocUi.el.main.append(libdocUi.el.searchOccurrencesCmd);
             libdocUi.el.searchOccurrencesCurrentIndexPosition = document.querySelector('#current_query_occurrence_index_position');
         }
@@ -829,33 +788,178 @@ const libdocUi = {
             }
         }
     },
-    update: function() {
-        libdocUi._currentScreenSizeName = libdocUi.getCurrentScreenSizeName();
-        hljs.highlightAll();
-        document.querySelectorAll('main>pre').forEach(function(elPre) {
-            elPre.style.paddingTop = '0';
-            const elCommands = elPre.querySelector('.copy_code_block');
-            if (elCommands === null) {
-                const commandBarMarkup = `<div class="d-flex jc-end">
-                        <button type="button"
-                            class="
-                            d-flex ai-center
-                            pt-5 pb-5 fvs-wght-400 fs-2 tt-uppercase
-                            bc-0 c-primary-900 b-0 cur-pointer
-                            copy_code_block">${libdocMessages.copyCode}</button>
-                    </div>`;
-                elPre.insertAdjacentHTML('afterbegin', commandBarMarkup);
+    setColorScheme: function(name) {
+        if (typeof name == 'string') {
+            if (libdocUi.defaults.colorSchemes.includes(name)) {
+                if (name == 'light') {
+                    libdocUi.el.darkModeCssMetaLink.href = '';
+                    libdocUi.el.darkModeCssMetaLink.media = libdocUi.defaults.darkModeCssMedia;
+                } else if (name == 'dark') {
+                    libdocUi.el.darkModeCssMetaLink.href = libdocUi.defaults.darkModeCssFilePath;
+                    libdocUi.el.darkModeCssMetaLink.media = '';
+                } else if (name == 'auto') {
+                    libdocUi.el.darkModeCssMetaLink.href = libdocUi.defaults.darkModeCssFilePath;
+                    libdocUi.el.darkModeCssMetaLink.media = libdocUi.defaults.darkModeCssMedia;
+                }
+                libdocUi.el.inputsColorScheme.forEach(function(elInput) {
+                    if (elInput.value == name) elInput.checked = true;
+                })
+                libdocUi.updateUserPreferences({
+                    colorScheme: name
+                });
             }
-            const elCode = elPre.querySelector('code');
-            if (elCode !== null) {
-                if (!elCode.classList.contains('hljs')) elCode.classList.add('hljs');
+        }
+    },
+    getJson: async function(url) {
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.log(error);
+            return [];
+        }
+    },
+    createCopyCodeOnCodeBlocks: function() {
+        const elsPre = document.querySelectorAll('main>pre');
+        if (elsPre.length > 0) {
+            elsPre.forEach(function(elPre) {
+                elPre.style.paddingTop = '0';
+                const elCommands = elPre.querySelector('.copy_code_block');
+                if (elCommands === null) {
+                    const commandBarMarkup = `<div class="d-flex jc-end | pos-relative">
+                            <button type="button"
+                                class="
+                                d-flex ai-center
+                                pt-5 pb-5 fvs-wght-400 fs-2 tt-uppercase
+                                bc-0 c-primary-900 b-0 cur-pointer
+                                copy_code_block">${libdocMessages.copyCode}</button>
+                        </div>`;
+                    elPre.insertAdjacentHTML('afterbegin', commandBarMarkup);
+                }
+                const elCode = elPre.querySelector('code');
+                if (elCode !== null) {
+                    const className = elCode.getAttribute('class');
+                    if (className !== null) {
+                        const languageClassSplit = elCode.getAttribute('class').split(' ');
+                        if (languageClassSplit.length > 0) elCode.dataset.languageName = languageClassSplit[0].toString().replace('language-', '');
+                    }
+                }
+            });
+            // Adjust proper language name display
+            const languagesNamesArray = libdocUi.getJson(libdocUi.defaults.supportedLanguagesJsonPath);
+            languagesNamesArray.then(languagesArray => {
+                if (languagesArray.length > 0) {
+                    document.querySelectorAll('code[data-language-name]').forEach(function(elCode) {
+                        const languageAlias = elCode.dataset.languageName;
+                        let index = -1;
+                        languagesArray.forEach(function(lang, langIndex) {
+                            if (lang.includes(languageAlias)) index = langIndex;
+                        });
+                        if (index > -1) {
+                            const languageName = languagesArray[index].split('|')[1];
+                            elCode.dataset.languageName = languageName;
+                        }
+                    })
+                }
+            });
+        }
+    },
+    initKeyShortcuts: function() {
+        if (typeof hotkeys == 'function') {
+            hotkeys('s', function (event, handler) {
+                // Set timeout to avoid shortcut letter to be typed into input field
+                if (handler.key == 's') setTimeout(function() { fuzzy.el.searchInput.focus()},100);
+            });
+        }
+    },
+    addExternalLinkIconIntoMainContent: function() {
+        libdocUi.el.main.querySelectorAll('main a[href^="https://"]').forEach(function(el) {
+            const link = new URL(el.href);
+            if (link.hostname != location.hostname) {
+                el.target = '_blank';
+                el.title = `${libdocMessages.open} ${el.href} ${libdocMessages.inANewTab.toLowerCase()}`;
+                if (link.hostname == libdocSystem.productionUrl) {
+                    el.classList.add('__external-link');
+                }
             }
         });
+    },
+    _updateCustomLinks: null,
+    updateCustomLinks: function() {
+        if (libdocUi.el.customLinks !== null && libdocUi.el.navPrimaryContainer !== null) {
+            const   ctnWidth = libdocUi.el.navPrimaryContainer.clientWidth,
+                    elsLinks = libdocUi.el.customLinks.querySelectorAll('a'),
+                    isLargeScreen = libdocUi.getCurrentScreenSizeName() == 'md' ? true : false;
+            if (elsLinks.length > 1 && isLargeScreen && libdocUi._updateCustomLinks === null) {
+                libdocUi._updateCustomLinks = {
+                    itemsWidth: 0,
+                    items: []
+                };
+                elsLinks.forEach(function(elLink) {
+                    libdocUi._updateCustomLinks.items.push({
+                        url: elLink.href,
+                        text: elLink.innerHTML.trim(),
+                        classNames: elLink.getAttribute('class'),
+                        width: elLink.clientWidth
+                    });
+                    libdocUi._updateCustomLinks.itemsWidth += elLink.clientWidth;
+                });
+                libdocUi.el.customLinks.innerHTML = '';
+                let     tempWidth = 0;
+                const   menuItems = [],
+                        paddingLeft = parseFloat(getComputedStyle(libdocUi.el.customLinks).paddingLeft),
+                        threshold = ctnWidth - 35 - paddingLeft;
+                libdocUi._updateCustomLinks.items.forEach(function(item) {
+                    tempWidth += item.width;
+                    const elLink = document.createElement('a');
+                    elLink.href = item.url;
+                    elLink.innerHTML = item.text;
+                    elLink.title = `${libdocMessages.open} ${item.text} ${libdocMessages.inANewTab}`;
+                    elLink.target = '_blank';
+                    if (tempWidth > threshold) {
+                        elLink.setAttribute('class', 'd-flex ai-center gap-1 | pt-3 pb-3 p-5 | fvs-wght-700 fs-2 lsp-3 lh-1 tt-uppercase td-none ws-nowrap | c-primary-600');
+                        menuItems.push(elLink);
+                    } else {
+                        elLink.setAttribute('class', item.classNames);
+                        libdocUi.el.customLinks.appendChild(elLink);
+                    }
+                });
+                if (menuItems.length > 0) {
+                    const   elDetails = document.createElement('details'),
+                            elSummary = document.createElement('summary'),
+                            elMenuItemsCtn = document.createElement('nav');
+                    elMenuItemsCtn.setAttribute('class', 'd-flex fd-column | pos-absolute right-0 | mr-3 | bc-neutral-100 bwidth-1 bstyle-dashed bcolor-neutral-500 brad-2 __soft-shadow');
+                    elDetails.setAttribute('class', 'pos-absolute right-0');
+                    elSummary.setAttribute('class', 'd-flex ai-center jc-end gap-1 | pt-2 pb-2 pl-4 pr-4 | lh-1 | cur-pointer c-primary-600');
+                    elSummary.setAttribute('title', libdocMessages.otherCustomLinks);
+                    elSummary.innerHTML = '<span class="icons"><span class="icon-plus-circle"></span><span class="icon-minus-circle"></span></span>';
+                    elDetails.appendChild(elSummary);
+                    menuItems.forEach(function(elItem) {
+                        elMenuItemsCtn.appendChild(elItem);
+                    });
+                    elDetails.appendChild(elMenuItemsCtn);
+                    libdocUi.el.customLinks.appendChild(elDetails);
+                    libdocUi.el.customLinks.classList.remove('o-auto');
+                } else {
+                    libdocUi.el.customLinks.classList.add('o-auto');
+                }
+            }
+        }
+    },
+    update: function() {
+        libdocUi.defaults.darkModeCssMedia = libdocUi.el.darkModeCssMetaLink.media;
+        libdocUi.setColorScheme(libdocUi.getUserPreferences().colorScheme);
+        libdocUi._currentScreenSizeName = libdocUi.getCurrentScreenSizeName();
+        hljs.highlightAll();
+        libdocUi.createCopyCodeOnCodeBlocks();
         libdocUi.createFloatingToc();
         libdocUi.createGoToTop();
         libdocUi.updateNavPrimary();
         libdocUi.updateFtocList();
         libdocUi.updateGTTBtns();
+        libdocUi.addExternalLinkIconIntoMainContent();
+        libdocUi.updateCustomLinks();
         libdocUi.el.navPrimaryCheckbox.addEventListener('change', libdocUi.handlers._navPrimaryCheckboxChange);
         window.addEventListener('resize', libdocUi.handlers._windowResize);
         window.addEventListener('load', libdocUi.handlers._windowLoad);
@@ -875,24 +979,14 @@ const libdocUi = {
         document.querySelectorAll('details[name="nav_primary"]').forEach(function(elDetail) {
             elDetail.addEventListener("toggle", libdocUi.handlers._toggleNavPrimaryAccordion);
         });
-
-        libdocUi.el.main.querySelectorAll('main a[href^="https://"]').forEach(function(el) {
-            const link = new URL(el.href);
-            if (link.hostname != location.hostname) {
-                el.target = '_blank';
-                el.title = `${libdocMessages.open} ${el.href} ${libdocMessages.inANewTab.toLowerCase()}`;
-                if (link.hostname == libdocSystem.productionUrl) {
-                    el.classList.add('__external-link');
-                }
-            }
-        });
         libdocUi.el.main.querySelectorAll('abbr[title]').forEach(function(el) {
             el.addEventListener('click', libdocUi.handlers._clickAbbr);
         });
-        document.querySelectorAll('main svg.icomoon-icon').forEach(function(el) {
-            libdocUi.fitSvgToItsContent(el)
-        });
         document.body.addEventListener('touchstart', libdocUi.handlers._touchStart);
+        libdocUi.el.inputsColorScheme.forEach(function(elInput) {
+            elInput.addEventListener('click', libdocUi.handlers._colorSchemeClick);
+        });
+        document.addEventListener('DOMContentLoaded', libdocUi.handlers._DOMContentLoaded);
     }
 }
 libdocUi.update();
