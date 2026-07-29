@@ -52,11 +52,11 @@ export default function (eleventyConfig) {
     // END SHORTCODES
 
     // START FILE COPY
-    eleventyConfig.addPassthroughCopy("sandboxes");
-    eleventyConfig.addPassthroughCopy("assets");
+    eleventyConfig.addPassthroughCopy({ "src/sandboxes": "sandboxes" });
+    eleventyConfig.addPassthroughCopy({ "src/assets": "assets" });
     eleventyConfig.addPassthroughCopy("core/assets");
-    eleventyConfig.addPassthroughCopy("favicon.png");
-    eleventyConfig.addPassthroughCopy("admin");
+    eleventyConfig.addPassthroughCopy({ "src/favicon.png": "favicon.png" });
+    eleventyConfig.addPassthroughCopy({ "src/admin": "admin" });
     // END FILE COPY
 
     eleventyConfig.addFilter("removeEscapedCharacted", function (value) {
@@ -66,6 +66,11 @@ export default function (eleventyConfig) {
 
 
     return {
+        dir: {
+            input: "src",
+            data: "../_data",
+            includes: "../_includes"
+        },
         pathPrefix: libdocConfig.htmlBasePathPrefix
     }
 };
