@@ -10,6 +10,8 @@ import pluginRss                            from "@11ty/eleventy-plugin-rss";
 import libdocConfig                         from "./_data/libdocConfig.js";
 import libdocFunctions                      from "./_data/libdocFunctions.js";
 // END LibDoc imports
+import { getLinks, getEntitlements } from "./_data/skus.js";
+import { markdownEquivalentsPlugin } from "./_data/markdown-equivalents.js";
 
 export default function(eleventyConfig) {
     // START PLUGINS
@@ -18,6 +20,7 @@ export default function(eleventyConfig) {
     eleventyConfig.addPlugin(eleventyNavigationPlugin);
     eleventyConfig.addPlugin(eleventyImageTransformPlugin, libdocFunctions.pluginsParameters.eleventyImageTransform());
     eleventyConfig.addPlugin(pluginRss);
+    eleventyConfig.addPlugin(markdownEquivalentsPlugin);
     // END PLUGINS
 
     // START FILTERS
@@ -45,16 +48,30 @@ export default function(eleventyConfig) {
     eleventyConfig.addShortcode("iconCard", libdocFunctions.shortcodes.iconCard);
     eleventyConfig.addPairedShortcode("sandbox", libdocFunctions.shortcodes.sandbox);
     eleventyConfig.addPairedShortcode("sandboxFile", libdocFunctions.shortcodes.sandboxFile);
+    eleventyConfig.addShortcode('tag', (arg) => `<div>${arg}</div>`);
+    eleventyConfig.addShortcode('sku', getLinks);
+    eleventyConfig.addShortcode('ent', getEntitlements);
     // END SHORTCODES
 
     // START FILE COPY
-	eleventyConfig.addPassthroughCopy("sandboxes");
-    eleventyConfig.addPassthroughCopy("assets");
+    eleventyConfig.addPassthroughCopy({ "src/sandboxes": "sandboxes" });
+    eleventyConfig.addPassthroughCopy({ "src/assets": "assets" });
     eleventyConfig.addPassthroughCopy("core/assets");
-    eleventyConfig.addPassthroughCopy("favicon.png");
+    eleventyConfig.addPassthroughCopy({ "src/favicon.png": "favicon.png" });
+    eleventyConfig.addPassthroughCopy({ "src/admin": "admin" });
     // END FILE COPY
-    
+
+    eleventyConfig.addFilter("removeEscapedCharacted", function (value) {
+        value = value.replace('\\:', '');
+        return value;
+    });
+
     return {
+        dir: {
+            input: "src",
+            data: "../_data",
+            includes: "../_includes"
+        },
         pathPrefix: libdocConfig.htmlBasePathPrefix
     }
 };

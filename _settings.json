@@ -1,0 +1,20 @@
+{
+    "siteTitle": "sn.jace.pro",
+    "siteDescription": "I got tired of looking at the docs and developer pages on ServiceNow to find the same information in multiple ways that was hard to find. So I built this site to help me find the information I need quickly and easily.",
+    "author": "Jace Benson",
+    "faviconUrl": "/assets/myfavicon.png",
+    "blogTitle": "Blog",
+    "customLinks": [],
+    "editThisPageRootUrl": "https://github.com/jacebenson/sn-2025/blob/main",
+    "searchEnabled": true,
+    "hljsLanguages": [
+        "xml",
+        "javascript",
+        "json",
+        "yaml",
+        "liquid",
+        "markdown",
+        "css"
+    ],
+    "lang": "en"
+}

@@ -11,48 +11,7 @@
     },
     "widthSidebar": 300,
     "widthContent": 700,
-    "icons": [
-        "x",
-        "arrow-line-down",
-        "arrow-line-up",
-        "arrow-square-out",
-        "calendar-dots",
-        "caret-down",
-        "caret-left",
-        "caret-right",
-        "caret-up",
-        "check-circle",
-        "check",
-        "circle-half",
-        "code",
-        "copy-simple",
-        "dots-six-vertical",
-        "faders",
-        "house",
-        "images",
-        "info",
-        "link-simple",
-        "list-dashes",
-        "list",
-        "lock-simple",
-        "magnifying-glass",
-        "minus-circle",
-        "parachute",
-        "pen",
-        "pencil-simple",
-        "person-arms-spread",
-        "play",
-        "plus-circle",
-        "printer",
-        "rocket",
-        "rss",
-        "shield-warning",
-        "sidebar",
-        "star-fill",
-        "star",
-        "tag-simple",
-        "user"
-    ],
+    "icomoonIconSize": 32,
     "pluginsParameters": {
         "eleventyImageTransform": {
             "formats": ["svg", "avif", "webp"],
@@ -69,26 +28,5 @@
             }
         }
     },
-    "productionUrl": "eleventy-libdoc.netlify.app",
-    "preferences": {
-        "colorSchemes": {
-            "choices": [
-                {
-                    "value": "auto",
-                    "labelMainKey": "colorSchemeAuto",
-                    "labelHelpKey": "colorSchemeDescriptionAuto"
-                },
-                {
-                    "value": "light",
-                    "labelMainKey": "colorSchemeLight",
-                    "labelHelpKey": "colorSchemeDescriptionLight"
-                },
-                {
-                    "value": "dark",
-                    "labelMainKey": "colorSchemeDark",
-                    "labelHelpKey": "colorSchemeDescriptionDark"
-                }
-            ]
-        }
-    }
+    "productionUrl": "eleventy-libdoc.netlify.app"
 }

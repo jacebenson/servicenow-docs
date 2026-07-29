@@ -1,9 +1,12 @@
 @media screen {
-    pre code.hljs,
-    main > pre > code {
+    pre code.hljs {
         display: block;
         overflow-x: auto;
         padding: 1em
+    }
+    
+    code.hljs {
+        padding: 3px 5px
     }
     
     /*
@@ -34,8 +37,7 @@
       SOFTWARE.
       
       */
-    .hljs,
-    main > pre > code {
+    .hljs {
         background: #011627;
         color: #d6deeb
     }
