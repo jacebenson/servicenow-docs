@@ -22,6 +22,8 @@ This is an Eleventy (11ty) static site generator project for ServiceNow document
 - Template literals for multi-line strings and HTML generation
 
 ### File Organization
-- Configuration in `_data/*.js` files exported as default objects
-- Markdown content in topic directories (`docs/`, `ux/`, `data/`, etc.)
-- Static assets in `assets/` and `core/assets/`
+- Configuration in `_data/*.js` files exported as default objects (project root)
+- **All content lives in `src/`** — markdown in topic dirs (`src/docs/`, `src/ux/`, `src/data/`, etc.)
+- Static assets in `src/assets/` and `core/assets/`
+- Input dir is `src/` (configured in .eleventy.js) — always edit content files under `src/`
+- Passthrough copy maps `src/assets/` → `_site/assets/`, `src/favicon.png` → `_site/favicon.png`, etc.
