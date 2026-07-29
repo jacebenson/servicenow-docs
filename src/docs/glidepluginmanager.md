@@ -6,8 +6,6 @@ eleventyNavigation:
     key: GlidePluginManager
     parent: Docs
 date: git Last Modified
-tags: 
-    - stub
 ---
 
 # isActive

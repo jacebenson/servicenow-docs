@@ -6,8 +6,6 @@ eleventyNavigation:
     key: GlideLocale
     parent: Docs
 date: git Last Modified
-tags: 
-    - stub
 ---
 
 ## getGroupingSeparator 

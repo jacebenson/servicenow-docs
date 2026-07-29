@@ -6,7 +6,6 @@ eleventyNavigation:
     key: Theme
     parent: Service Portal
 date: git Last Modified
-tags: []
 ---
 
 [Docs](https://www.servicenow.com/docs/csh?topicname=c_BrandingEditor.html&version=latest)

@@ -6,8 +6,6 @@ eleventyNavigation:
     key: Walk Up
     parent: Service Portal
 date: git Last Modified
-tags: 
-    - stub
 ---
 
 ## Additional Resources

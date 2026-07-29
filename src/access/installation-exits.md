@@ -6,8 +6,6 @@ eleventyNavigation:
     parent: Access
     order: 600
 date: git Last Modified
-tags: 
-    - stub
 ---
 
 [Docs](https://www.servicenow.com/docs/csh?topicname=r_InstallationExits.html&version=latest)

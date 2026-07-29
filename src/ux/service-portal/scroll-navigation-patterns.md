@@ -6,12 +6,6 @@ eleventyNavigation:
     key: Scroll Navigation Patterns
     parent: Scripts
 date: git Last Modified
-tags: 
-    - stub
-    - servicenow
-    - service-portal
-    - ui-behavior
-    - javascript
 permalink: "/servicenow/service-portal/scroll-navigation-patterns/"
 ---
 

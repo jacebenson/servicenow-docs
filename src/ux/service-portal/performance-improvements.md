@@ -6,13 +6,6 @@ eleventyNavigation:
     key: "Identify slow Service Portal widgets"
     parent: Tricks & Tips
 date: git Last Modified
-tags: 
-    - stub
-    - servicenow
-    - service-portal
-    - performance
-    - tips-and-tricks
-    - troubleshooting
 ---
 
 ## Service Portal Performance issues

@@ -6,7 +6,6 @@ eleventyNavigation:
     key: Widget
     parent: Service Portal
 date: git Last Modified
-tags: []
 ---
 
 [Official Docs](https://www.servicenow.com/docs/csh?topicname=service-portal-widgets.html&version=latest)

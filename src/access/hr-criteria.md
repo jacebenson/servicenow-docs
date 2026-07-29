@@ -6,8 +6,6 @@ eleventyNavigation:
     parent: Access
     order: 950
 date: git Last Modified
-tags: 
-    - stub
 ---
 
 [Docs](https://www.servicenow.com/docs/csh?topicname=hr-criteria.html&version=latest)

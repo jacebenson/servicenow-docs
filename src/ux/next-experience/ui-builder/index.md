@@ -6,8 +6,6 @@ date: git Last Modified
 eleventyNavigation:
     key: UI Builder
     parent: Next Experience
-tags: 
-    - stub
 ---
 [📄 - Maik Skoddow - UI Builder](https://www.servicenow.com/community/next-experience-articles/platform-ui-builder-knowledge-amp-troubleshooting-resources/ta-p/2590956)
 

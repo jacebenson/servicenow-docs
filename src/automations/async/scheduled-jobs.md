@@ -7,8 +7,6 @@ eleventyNavigation:
     key: Scheduled Jobs
     order: 2900
 date: git Last Modified
-tags: 
-    - stub
 ---
 
 [Docs](https://www.servicenow.com/docs/csh?topicname=c_ScheduledJobs.html&version=latest)

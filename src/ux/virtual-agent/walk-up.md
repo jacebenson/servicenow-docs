@@ -6,8 +6,6 @@ eleventyNavigation:
     key: Walk Up
     parent: Virtual Agent
 date: git Last Modified
-tags: 
-    - stub
 ---
 
 ## Additional Resources

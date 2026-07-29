@@ -6,8 +6,6 @@ eleventyNavigation:
     parent: Access
     order: 700
 date: git Last Modified
-tags: 
-    - stub
 ---
 
 [Docs](https://www.servicenow.com/docs/csh?topicname=c_SPSSOLoginAndRedirects.html&version=latest)

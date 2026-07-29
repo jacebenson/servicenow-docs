@@ -6,8 +6,6 @@ eleventyNavigation:
     key: GlideServlet
     parent: Docs
 date: git Last Modified
-tags: 
-    - stub
 ---
 
 # GlideServlet aka Processors

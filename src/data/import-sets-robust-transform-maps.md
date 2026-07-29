@@ -6,8 +6,6 @@ eleventyNavigation:
     key: Transform Maps
     order: 2800
 date: git Last Modified
-tags: 
-    - stub
 ---
 Content not yet written
 <!-- TODO: FILL THIS OUT-->

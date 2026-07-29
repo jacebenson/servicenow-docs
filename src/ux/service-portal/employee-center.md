@@ -6,8 +6,6 @@ eleventyNavigation:
     key: Widget
     parent: Employee Center
 date: git Last Modified
-tags: 
-    - stub
 ---
 
 ## Additional Resources

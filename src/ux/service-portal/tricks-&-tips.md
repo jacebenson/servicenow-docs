@@ -6,8 +6,6 @@ eleventyNavigation:
     key: Tricks & Tips
     parent: Service Portal
 date: git Last Modified
-tags: 
-    - stub
 ---
 
 ## Service Portal Tips and Tricks

@@ -6,8 +6,6 @@ eleventyNavigation:
     key: Application Files
     order: 2900
 date: git Last Modified
-tags: 
-    - stub
 ---
 This table is used to store files that are part of an application.
 

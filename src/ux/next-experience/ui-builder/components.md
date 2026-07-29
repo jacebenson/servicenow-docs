@@ -6,8 +6,6 @@ date: git Last Modified
 eleventyNavigation:
     key: Components
     parent: UI Builder
-tags: 
-    - stub
 ---
 https://www.servicenow.com/docs/csh?topicname=work-components.html&version=latest
 

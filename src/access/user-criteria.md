@@ -7,8 +7,6 @@ eleventyNavigation:
     order: 900
 date: git Last Modified
 order: 100
-tags: 
-    - stub
 ---
 
 User Criteria is one the "new" ways to control who has access to what.  It is more complicated and allows you to dicate folks in a group or based on location (or other attributes set on their user profile).

@@ -6,8 +6,6 @@ eleventyNavigation:
     key: Remote Tables
     order: 2800
 date: git Last Modified
-tags: 
-    - stub
 ---
 Remote tables is a relatively new feature it's only been around for about four or 5 years nowbut ever since I heard this older name for it i've never been able to see them the same and that namewas scripted tablesit's my belief that they called them remote tables so they could betterposition their integration hub product to make more money on selling connections and the costs of making those transactions
 

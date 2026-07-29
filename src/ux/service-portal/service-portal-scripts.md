@@ -6,6 +6,4 @@ eleventyNavigation:
     key: Scripts
     parent: Widget
 date: git Last Modified
-tags: 
-    - stub
 ---

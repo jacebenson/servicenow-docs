@@ -6,7 +6,6 @@ eleventyNavigation:
     key: Page
     parent: Service Portal
 date: git Last Modified
-tags: []
 ---
 
 [Official Docs](https://www.servicenow.com/docs/csh?topicname=c_Pages.html&version=latest)

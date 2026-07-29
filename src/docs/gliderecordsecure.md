@@ -6,8 +6,6 @@ eleventyNavigation:
     key: GlideRecordSecure
     parent: GlideRecord
 date: git Last Modified
-tags: 
-    - stub
 ---
 
 [GlideRecordSecure](/docs/gliderecordsecure/) is a class inherited from [GlideRecord](/docs/gliderecord/) that performs the same functions as GlideRecord, and also enforces ACLs.

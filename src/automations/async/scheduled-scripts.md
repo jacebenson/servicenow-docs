@@ -7,8 +7,6 @@ eleventyNavigation:
     key: Scheduled Scripts
     order: 2901
 date: git Last Modified
-tags: 
-    - stub
 ---
 
 [Docs](https://www.servicenow.com/docs/csh?topicname=t_ScheduleAScriptExecution.html&version=latest)

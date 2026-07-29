@@ -7,8 +7,6 @@ eleventyNavigation:
     key: Database Views
     order: 2800
 date: git Last Modified
-tags: 
-    - stub
 ---
 Database views are amazing a very old feature of ServiceNow you can connect one table to another table with a simple script sayingwhere table A is number field matches table B's number field join them together or left join them or right join them so you can get that data how you need it to.
 

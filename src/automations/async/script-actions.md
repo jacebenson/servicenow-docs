@@ -7,8 +7,6 @@ eleventyNavigation:
     key: Script Actions
     order: 300
 date: git Last Modified
-tags: 
-    - stub
 ---
 
 [Docs](https://www.servicenow.com/docs/csh?topicname=r_ScriptActions.html&version=latest)

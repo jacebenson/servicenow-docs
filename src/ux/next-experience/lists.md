@@ -6,8 +6,6 @@ date: git Last Modified
 eleventyNavigation:
     key: Lists
     parent: Next Experience
-tags: 
-    - stub
 ---
 
 To change the Lists on the left of a workspace there are a few tables involved and they don't show up in UI Builder.

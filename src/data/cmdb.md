@@ -7,8 +7,6 @@ eleventyNavigation:
     key: CMDB
     order: 2800
 date: git Last Modified
-tags: 
-    - stub
 ---
 
 The configuration management database and service now is one of the three main tables that exists
