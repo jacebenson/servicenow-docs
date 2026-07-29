@@ -1,32 +1,24 @@
 {
-    "siteTitle": "My Project Title",
-    "siteDescription": "This is the description of my project title",
-    "author": "John Doe",
+    "siteTitle": "sn.jace.pro",
+    "siteDescription": "I got tired of looking at the docs and developer pages on ServiceNow to find the same information in multiple ways that was hard to find. So I built this site to help me find the information I need quickly and easily.",
+    "author": "Jace Benson",
     "faviconUrl": "/assets/myfavicon.png",
-    "blogTitle": "Blog",
-    "blogDescription": "Here is the description of the blog part",
-    "productionUrl": "https://eleventy-libdoc.netlify.app",
     "customLinks": [
         {
-            "url": "/feed.xml",
-            "text": "Atom feed"
-        },
-        {
-            "url": "https://github.com/ita-design-system/eleventy-libdoc",
+            "url": "https://github.com/jacebenson/servicenow-docs",
             "text": "GitHub"
-        },
-        {
-            "url": "#",
-            "text": "Bluesky"
-        },
-        {
-            "url": "#",
-            "text": "LinkedIn"
-        },
-        {
-            "url": "#",
-            "text": "CodePen"
         }
     ],
-    "editThisPageRootUrl": "https://github.com/ita-design-system/eleventy-libdoc/blob/main"
+    "editThisPageRootUrl": "https://github.com/jacebenson/servicenow-docs/blob/main",
+    "searchEnabled": true,
+    "hljsLanguages": [
+        "xml",
+        "javascript",
+        "json",
+        "yaml",
+        "liquid",
+        "markdown",
+        "css"
+    ],
+    "lang": "en"
 }
