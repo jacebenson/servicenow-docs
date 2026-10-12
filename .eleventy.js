@@ -66,6 +66,17 @@ export default function(eleventyConfig) {
         return value;
     });
 
+    // Add read-only WebMCP tools to every generated page.
+    // Browsers without the early-preview API ignore the script.
+    // A few pages render as bare content fragments with no body element, so
+    // append the script there instead of dropping the tools.
+    eleventyConfig.addTransform("webmcp-tools", function (content) {
+        if (!this.outputPath?.endsWith(".html")) return content;
+        const tag = '    <script src="/core/assets/js/webmcp.js" defer></script>';
+        if (content.includes("</body>")) return content.replace("</body>", `${tag}\n</body>`);
+        return `${content}\n${tag}\n`;
+    });
+
     return {
         dir: {
             input: "src",
