@@ -57,5 +57,5 @@ POST /ecc_queue.do?JSON&sysparm_action=insert
 
 ## Note
 
-- For Geneva and later, prefer the [REST Attachment API](../rest/attachment-api/)
+- For Geneva and later, prefer the [REST Attachment API](/automations/inbound/rest/attachment-api/)
 - Requires `rest_service` role and ECC Queue create ACL
