@@ -23,7 +23,7 @@ I consider it be akin to Row Level Security in other technologies.
 
 These are great for limiting large tables to only the records that a user should see.  For example, if you have a table of 1,000,000 records and you want to limit a user to only seeing 500 of them, you can do that with a before query BR.
 
-You could do that with [Access Controls](/access/accesscontrols), but keep in mind, those run AFTER the rows are returned from the database.  So if you're asking for all the employees at ACME Corp (with 100,000,000) users, that query might take a very long time.  If you have a before query BR, you can limit the query to only the users the logged in user can see.
+You could do that with [Access Controls](/access/access-controls/), but keep in mind, those run AFTER the rows are returned from the database.  So if you're asking for all the employees at ACME Corp (with 100,000,000) users, that query might take a very long time.  If you have a before query BR, you can limit the query to only the users the logged in user can see.
 
 ## Further Reading
 

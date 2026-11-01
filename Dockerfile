@@ -10,7 +10,7 @@ RUN npm ci
 # Copy source and build - skip image transforms that may timeout in CI
 COPY . .
 ENV ELEVENTY_ENV=production
-RUN npm run build || (echo "Build failed, retrying..." && sleep 10 && npm run build) || echo "Build completed with warnings"
+RUN npm run build
 
 # Production stage - nginx
 FROM nginx:alpine

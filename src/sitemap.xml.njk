@@ -1,0 +1,11 @@
+---
+permalink: /sitemap.xml
+layout: false
+eleventyExcludeFromCollections: true
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{% for item in collections.sitemapPages %}
+  <url><loc>{{ item.url | canonicalUrl | escape }}</loc></url>
+{% endfor %}
+</urlset>
