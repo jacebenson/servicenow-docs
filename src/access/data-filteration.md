@@ -10,7 +10,7 @@ date: git Last Modified
 
 [Docs](https://www.servicenow.com/docs/csh?topicname=data-filtration.html&version=latest)
 
-I was so very excited for Data Filtration when it was announced because I thought it was another way to do something like [Before Query Business Rules](/access/beforequerybusinessrules).  It however runs after the rows are returned like [Access Controls](/access/accesscontrols).  So it's not a great way to limit access to large tables.  It is however another tool in the security toolbox.  This may be changing but only with the "new" version of it.  I'd steer clear of it for a time until it works as intended.
+I was so very excited for Data Filtration when it was announced because I thought it was another way to do something like [Before Query Business Rules](/access/before-query-business-rules/).  It however runs after the rows are returned like [Access Controls](/access/access-controls/).  So it's not a great way to limit access to large tables.  It is however another tool in the security toolbox.  This may be changing but only with the "new" version of it.  I'd steer clear of it for a time until it works as intended.
 
 This has changed some over time and I would call this a RISKY feature as they have remade this once already.
 

@@ -14,9 +14,9 @@ GlideRecord's are one of the simplest ways to automate in ServiceNow.
 
 A `GlideRecord` is a class of object that represents a table & offers a scriptable API to access records on that table
 
-`GlideRecord` is comprised of [`GlideElements`](docs/glideelement) as well as other methods and metadata that work together to allow you to query from and write to database tables
+`GlideRecord` is comprised of [`GlideElements`](/docs/glideelement/) as well as other methods and metadata that work together to allow you to query from and write to database tables
 
-[`GlideElement`](docs/glideelement) is a class of object that represents a column on a table
+[`GlideElement`](/docs/glideelement/) is a class of object that represents a column on a table
 
 There are two versions of GlideRecord, the client side version, and the server side version. [docs](https://developer.servicenow.com/dev.do#!/reference/api/latest/server/no-namespace/c_GlideRecordScopedAPI)
 
@@ -43,7 +43,7 @@ There are two versions of GlideRecord, the client side version, and the server s
 | Query    | [chooseWindow](#choosewindow)                 | Sets a range of rows to be returned by subsequent queries. If forceCount is true, getRowCount() method will return all possible records |
 | Query    | [get](#get)                                   | Get's a single record                                                                                                                   |
 | Query    | [getEncodedQuery](#getencodedquery)           | Returns the query in it's encoded form                                                                                                  |
-| Query    | [getRowCount](#getrowcount)                   | Gets the number of rows, not recomeneded, use [GlideAggregate](docs/glideaggregate) instead                                             |
+| Query    | [getRowCount](#getrowcount)                   | Gets the number of rows, not recomeneded, use [GlideAggregate](/docs/glideaggregate/) instead                                             |
 | Query    | [hasNext](#hasnext)                           | Determines if there are any more records in the GlideRecord                                                                             |
 | Query    | [next](#next)                                 | Moves to the next record in the GlideRecord                                                                                             |
 | Query    | [orderBy](#orderby)                           | Sets the order by to A-Z on the specified field                                                                                         |

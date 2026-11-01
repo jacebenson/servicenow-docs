@@ -15,7 +15,7 @@ The Attachment API provides REST endpoints for uploading, downloading, and manag
 
 ## Key Difference
 
-Unlike the [SOAP AttachmentCreator](../soap/attachment-creator/), the target record **must exist** before attaching.
+Unlike the [SOAP AttachmentCreator](/automations/inbound/soap/attachment-creator/), the target record **must exist** before attaching.
 
 ## Endpoints
 

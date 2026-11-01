@@ -23,6 +23,13 @@ export default function(eleventyConfig) {
     eleventyConfig.addPlugin(markdownEquivalentsPlugin);
     // END PLUGINS
 
+    eleventyConfig.addFilter("canonicalUrl", value => new URL(value, "https://sn.jace.pro").href);
+    eleventyConfig.addCollection("sitemapPages", api => api.getAll().filter(item =>
+        item.url && (item.url.endsWith("/") || item.url.endsWith(".html")) &&
+        !item.url.startsWith("/admin/") && !item.url.startsWith("/sandboxes/") &&
+        !item.data.noindex && !item.data.excludeFromSitemap
+    ));
+
     // START FILTERS
     eleventyConfig.addAsyncFilter("autoids", libdocFunctions.filters.autoids);
     eleventyConfig.addAsyncFilter("embed", libdocFunctions.filters.embed);
