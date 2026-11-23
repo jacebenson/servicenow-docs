@@ -1,6 +1,6 @@
 ---
-title: GlideRecord
-description: GlideRecord is a class of object that represents a table & offers a scriptable API to access records on that table
+title: 'ServiceNow GlideRecord API: methods and examples'
+description: 'ServiceNow GlideRecord server-side API reference with query, orderBy and insert examples, plus scoped/global boundaries and setUseEngines cautions.'
 layout: libdoc_page.liquid
 eleventyNavigation:
     key: GlideRecord
@@ -8,7 +8,37 @@ eleventyNavigation:
 date: git Last Modified
 ---
 
-GlideRecord's are one of the simplest ways to automate in ServiceNow.
+[Docs: GlideRecord, global server API](https://www.servicenow.com/docs/r/zurich/api-reference/server-api-reference/c_GlideRecordAPI.html)
+
+GlideRecord queries ServiceNow tables and reads or writes their records. Start with a filtered query, then use `next()` to move through the results.
+
+## Query example
+
+This read-only server-side example returns up to five active incidents, newest first. It uses stored field values, not display labels.
+
+```js
+const incident = new GlideRecord('incident');
+incident.addQuery('active', true);
+incident.orderByDesc('sys_created_on');
+incident.setLimit(5);
+incident.query();
+while (incident.next()) {
+  const number = incident.getValue('number');
+  const summary = incident.getValue('short_description');
+  gs.info(number + ': ' + summary);
+}
+```
+
+See [query](#query), [orderBy](#orderby), [insert](#insert) and [setUseEngines](#setuseengines), or browse the [method table](#methods-available).
+
+## Server, client and scope
+
+The examples here use server-side GlideRecord. The [scoped API](https://www.servicenow.com/docs/r/zurich/api-reference/server-api-reference/c_GlideRecordScopedAPI.html) and global API are separate references. Check the documented scope before copying a method, especially `setUseEngines`, which is documented in the global reference.
+
+Client-side GlideRecord is a different, restricted API. Do not move these server scripts into a Client Script. For browser-to-server requests, see [GlideAjax](/docs/glideajax/). For form values and field state, see [GlideForm](/docs/glideform/).
+
+A query filter is not an access-control policy. Review record and field access before exposing server-side results to a client.
+
 
 ## What is a GlideRecord?
 
@@ -72,7 +102,7 @@ There are two versions of GlideRecord, the client side version, and the server s
 | Write    | [isActionAborted](#isactionaborted)           | Determines whether the current database action is to be aborted. Available in Fuji patch 3                                              |
 | Write    | [isNewRecord](#isnewrecord)                   | Checks if the current record is a new record that has not yet been inserted into the database                                           |
 | Write    | [isValidField](#isvalidfield)                 | Determines if the given field is defined in the current table                                                                           |
-| Write    | [isValidRecord](#usvalidrecord)               | Determines if current record is a valid record                                                                                          |
+| Write    | [isValidRecord](#isvalidrecord)               | Determines if current record is a valid record                                                                                          |
 | Write    | [newRecord](#newrecord)                       | Sets up the GlideRecord to follow the default values and assigns a sys\_id                                                              |
 | Write    | [setCategory](#setcategory)                   | Sets the category, which determines how the query is routed to a secondary database pool.                                               |
 | Write    | [setForceUpdate](#setforceupdate)             | Flag to allow a save/update when there are no changes                                                                                   |
@@ -125,16 +155,14 @@ incident.insert();//returns the sys_id string of inserted record
 
 ### setUseEngines
 
-Enables or disables the running of script engines.
+`setUseEngines(boolean)` enables or disables engines such as approval and assignment rules. The [global API reference](https://www.servicenow.com/docs/r/zurich/api-reference/server-api-reference/c_GlideRecordAPI.html) warns that disabling engines can significantly change instance behavior.
 
-[Here you can see the engines called out on the docs.](https://www.servicenow.com/docs/csh?topicname=execution-order-scripts-engines.html&version=latest)
+This is not the same switch as `setWorkflow()`, and it is not a general promise to disable every automation or bypass security. Leave engines enabled for ordinary inserts and updates. Test any exception in a non-production instance before using it in production.
 
 ```js
-var incident = new GlideRecord('incident');
-incident.newRecord();
-incident.setValue('short_description','This is text');
-incident.setUseEngines(false);//default is true
-incident.insert();//returns the sys_id string of inserted record
+// Global server API. Keep approval and assignment engines enabled.
+const incident = new GlideRecord('incident');
+incident.setUseEngines(true);
 ```
 
 ## Access
@@ -282,39 +310,36 @@ Moves to the next record in the GlideRecord.
 
 ### orderBy
 
-This will return your set order ascending (a-z, 1-9) by the column name,
-and is opposite of orderByDesc.
+`orderBy(fieldName)` sorts the query results in ascending order. Call it before `query()`. Call it more than once to sort by multiple fields.
 
 ```js
-var incident = new GlideRecord('incident');
-incident.addEncodedQuery('active=true');
+const incident = new GlideRecord('incident');
+incident.addQuery('active', true);
+incident.orderBy('priority');
 incident.orderBy('number');
+incident.setLimit(10);
 incident.query();
-while(incident.next()){
-    gs.info('found record');
-    gs.info(incident.getValue('number'));
-} else {
-    gs.info('no record found');
+while (incident.next()) {
+  gs.info(incident.getValue('number'));
 }
 ```
 
 ### orderByDesc
 
-This will return your set order descending (z-a, 9-1) by the columne
-name, and is opposibe of orderBy.
+`orderByDesc(fieldName)` sorts in descending order. For newest records first, sort a date field rather than assuming the record number has the same order.
 
 ```js
-var incident = new GlideRecord('incident');
-incident.addEncodedQuery('active=true');
-incident.orderByDesc('number');
+const incident = new GlideRecord('incident');
+incident.addQuery('active', true);
+incident.orderByDesc('sys_created_on');
+incident.setLimit(10);
 incident.query();
-while(incident.next()){
-    gs.info('found record');
-    gs.info(incident.getValue('number'));
-} else {
-    gs.info('no record found');
+while (incident.next()) {
+  gs.info(incident.getValue('number'));
 }
 ```
+
+<span id="query-29"></span>
 
 ### query
 
@@ -472,12 +497,23 @@ incident.insert();//returns the sys_id string of inserted record
 
 ### Insert
 
-So to be absolutely clear, to insert or update a record it's nearly the
-same code, except you use `.insert();` or `.update();`. However you may
-want to use those with the following methods;
+`insert()` creates a record using the field values set on the GlideRecord. It returns the new record's `sys_id`, or `null` if the record is not inserted. See the [official insert reference](https://www.servicenow.com/docs/r/zurich/api-reference/server-api-reference/c_GlideRecordAPI.html).
 
-Insert a new record using the field values that have been set for the
-current record.
+This example writes an incident. Use only in a development instance where you are authorized to create test data. Business rules, mandatory fields and application configuration can affect the result.
+
+```js
+const incident = new GlideRecord('incident');
+incident.initialize();
+incident.setValue('short_description', 'Development API example');
+const sysId = incident.insert();
+if (sysId) {
+  gs.info('Created incident ' + sysId);
+} else {
+  gs.error('Incident was not inserted');
+}
+```
+
+`initialize()` prepares an empty record for insertion. `newRecord()` also sets default values and assigns a unique ID. Neither method saves the record by itself.
 
 ### isActionAborted
 

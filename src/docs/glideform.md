@@ -1,6 +1,6 @@
 ---
-title: GlideForm (g_form)
-description: GlideForm is a standard javascript object that holds all the methods you would need to work with a form.
+title: 'ServiceNow GlideForm API: g_form methods and examples'
+description: 'ServiceNow GlideForm client API reference with a g_form onChange example, field values, messages and UI-specific method notes.'
 layout: libdoc_page.liquid
 eleventyNavigation:
     key: GlideForm (g_form)
@@ -8,9 +8,42 @@ eleventyNavigation:
 date: git Last Modified
 ---
 
-g_form is used very heavily all over in ServiceNow.
-As such it has a lot of documented and undocumented functions.
-Below I go over all of them and how to use them.
+[Docs: GlideForm client API](https://www.servicenow.com/docs/r/zurich/api-reference/c_GlideFormAPI.html)
+
+GlideForm is the client-side API available as `g_form` in ServiceNow Client Scripts. Use it to read form values, change field state and show messages. For server-side database records, use [GlideRecord](/docs/gliderecord/) instead.
+
+## Client Script example
+
+On an Incident form, create an onChange Client Script for `short_description`. This example shows a field message when the value is empty. It does not save or update a database record.
+
+```js
+function onChange(
+  control, oldValue, newValue,
+  isLoading, isTemplate
+) {
+  if (isLoading || isTemplate) {
+    return;
+  }
+  const field = 'short_description';
+  g_form.hideFieldMsg(field, true);
+  if (g_form.getValue(field) === '') {
+    g_form.showFieldMsg(
+      field, 'Add a short description.',
+      'info', false
+    );
+  }
+}
+```
+
+`getValue()` reads the stored field value, not its display label. Prefer a UI Policy for declarative mandatory, read-only and visibility rules. Client-side behavior is not a replacement for server-side access control or validation.
+
+## Method navigation and UI support
+
+Start with [getValue](#desktop-getvalue), [setValue](#desktop-setvalue), [setMandatory](#desktop-setmandatory) and [showFieldMsg](#desktop-showfieldmsg). The table below links the longer method notes.
+
+The historical Mobile/SP/Workspaces column groups different interfaces. It is not a guarantee that every listed method works in every one of them. Check the [Next Experience API](https://www.servicenow.com/docs/r/zurich/api-reference/GlideFormAPINX.html) or [Mobile API](https://www.servicenow.com/docs/r/zurich/api-reference/c_MobileGlideForm_API.html) for the interface you use. Desktop DOM methods are especially poor portability assumptions.
+
+This page retains undocumented methods and older interface notes for reference. They are not supported API contracts. Prefer documented methods and verify them against your instance's release.
 
 
 | Property / Method             | CoreUI                                            | Mobile/SP/Workspaces                  | Documented |
@@ -571,6 +604,8 @@ g_form.setMandatory('quantity',true);// changes field to required or not
 ```js
  g_form.setReadOnly('stage',false);// changes field to read only or not
 ```
+
+<span id="mobile-setreadonly-46"></span>
 
 ## Mobile setReadonly
 
@@ -1304,6 +1339,9 @@ from a catalog in a catalog client script.
 g_form.addValidator(fld.id, validator.validate);
 ```
 
+<span id="desktop-addwarningmessage"></span>
+<span id="desktop-115"></span>
+
 ## Desktop 
 
 ```js
@@ -1570,6 +1608,8 @@ dd.render();
 ## Desktop setLiveUpdating
 
 ## Desktop setMandatoryOnlyIfModified
+
+<span id="desktop-setreadonly-178"></span>
 
 ## Desktop setReadonly
 
